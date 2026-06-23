@@ -1,0 +1,54 @@
+name: Update Workout
+
+on:
+  # Triggered by the Strava webhook via repository_dispatch
+  repository_dispatch:
+    types: [strava_activity]
+
+  # Also allow manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      activity_id:
+        description: 'Strava Activity ID (optional — leave blank for latest)'
+        required: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run update script
+        run: |
+          if [ -n "${{ github.event.client_payload.activity_id }}" ]; then
+            python3 scripts/update_workout.py --activity-id ${{ github.event.client_payload.activity_id }}
+          elif [ -n "${{ github.event.inputs.activity_id }}" ]; then
+            python3 scripts/update_workout.py --activity-id ${{ github.event.inputs.activity_id }}
+          else
+            python3 scripts/update_workout.py
+          fi
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          WHOOP_CLIENT_ID: ${{ secrets.WHOOP_CLIENT_ID }}
+          WHOOP_CLIENT_SECRET: ${{ secrets.WHOOP_CLIENT_SECRET }}
+          WHOOP_REFRESH_TOKEN: ${{ secrets.WHOOP_REFRESH_TOKEN }}
+
+      - name: Commit updated calendar
+        run: |
+          git config user.email "cam@horyzon.co"
+          git config user.name "Cameron-Horne"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Auto-update: workout for $(date +%Y-%m-%d)"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
