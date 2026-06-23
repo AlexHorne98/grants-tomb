@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cam Horne — Cycling</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f13;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    text-align: center;
+    padding: 28px 24px 0;
+  }
+  .site-header h1 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #f1f5f9;
+  }
+  .site-header .sub {
+    color: #475569;
+    font-size: 0.82rem;
+    margin-top: 4px;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 20px 24px 0;
+  }
+  .tab-btn {
+    background: #161620;
+    border: 1px solid #1e1e2e;
+    border-radius: 10px;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 8px 20px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { border-color: #2d2d45; color: #94a3b8; }
+  .tab-btn.active {
+    background: #1e293b;
+    border-color: #3b82f6;
+    color: #60a5fa;
+  }
+
+  /* ── TAB PANELS ── */
+  .tab-panel { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* ── TRAINING: MONTH NAV ── */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .month-nav button {
+    background: #161620;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 6px 14px;
+    transition: all 0.12s;
+  }
+  .month-nav button:hover { border-color: #3b82f6; color: #60a5fa; }
+  .month-nav button:disabled { opacity: 0.3; cursor: default; }
+  .month-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    min-width: 160px;
+    text-align: center;
+  }
+
+  /* ── COUNTDOWN BANNER ── */
+  .banner {
+    text-align: center;
+    margin-bottom: 24px;
+    background: #1a1400;
+    border: 1px solid #f59e0b30;
+    border-radius: 14px;
+    padding: 16px 20px;
+  }
+  .banner-num {
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: #f59e0b;
+    line-height: 1;
+  }
+  .banner-label {
+    font-size: 0.75rem;
+    color: #78350f;
+    margin-top: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+  .banner.race-done { background: #052e16; border-color: #4ade8030; }
+  .banner.race-done .banner-num { color: #4ade80; }
+  .banner.race-done .banner-label { color: #166534; }
+
+  /* ── ZONE PILLS ── */
+  .zones {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .zpill { padding: 3px 11px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; }
+  .zpill.z2    { background: #1e3a5f; color: #60a5fa; }
+  .zpill.ss    { background: #14532d; color: #4ade80; }
+  .zpill.thr   { background: #431407; color: #fb923c; }
+  .zpill.vo2   { background: #3b0764; color: #c084fc; }
+  .zpill.punch { background: #450a0a; color: #f87171; }
+
+  /* ── WEEK BLOCK ── */
+  .week-block { margin-bottom: 28px; }
+  .week-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #475569;
+    margin-bottom: 8px;
+    padding-left: 2px;
+  }
+  .week-label em { font-style: normal; color: #334155; font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 9px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: #161620;
+    border: 1px solid #1e1e2e;
+    border-radius: 11px;
+    padding: 12px;
+    min-height: 76px;
+    position: relative;
+    transition: transform 0.12s, border-color 0.12s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: #2d2d45; }
+
+  .card.today { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f625, 0 4px 20px #3b82f610; }
+  .card.today .card-dow::after { content: ' · TODAY'; color: #3b82f6; font-weight: 800; font-size: 0.62rem; letter-spacing: 0.8px; }
+
+  .card.done { opacity: 0.5; }
+  .card.done .card-name::after { content: ' ✓'; color: #4ade80; }
+
+  .card.missed { opacity: 0.65; border-color: #ef444440; background: #1a0a0a; }
+  .card.missed .card-name::after { content: ' ✗'; color: #f87171; }
+
+  .card.modified { opacity: 0.7; border-color: #f59e0b40; }
+  .card.modified .card-name::after { content: ' ~'; color: #fbbf24; }
+
+  .card.race { background: #1a1400; border-color: #f59e0b; box-shadow: 0 0 0 1px #f59e0b25, 0 4px 24px #f59e0b18; }
+  .card.race-done { background: #052e16; border-color: #4ade80; box-shadow: 0 0 0 1px #4ade8025; }
+
+  .card-dow { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; margin-bottom: 4px; }
+  .card-name { font-size: 0.93rem; font-weight: 700; color: #f1f5f9; line-height: 1.2; margin-bottom: 6px; }
+  .card.race .card-name { color: #fbbf24; }
+  .card.race-done .card-name { color: #4ade80; }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+  .b-quality  { background: #2e1065; color: #a78bfa; }
+  .b-long     { background: #052e16; color: #4ade80; }
+  .b-easy     { background: #0c2340; color: #60a5fa; }
+  .b-gym      { background: #1c1c00; color: #facc15; }
+  .b-taper    { background: #1c0f00; color: #fb923c; }
+  .b-race     { background: #2d1500; color: #fbbf24; }
+  .b-done     { background: #052e16; color: #4ade80; }
+  .b-missed   { background: #3b0a0a; color: #f87171; }
+  .b-modified { background: #1c1400; color: #fbbf24; }
+  .b-base     { background: #0c2340; color: #60a5fa; }
+
+  .detail { font-size: 0.76rem; color: #94a3b8; line-height: 1.45; }
+  .detail strong { color: #cbd5e1; }
+
+  .ztags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .ztag { font-size: 0.64rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+  .ztag.z2    { background: #1e3a5f55; color: #60a5fa; }
+  .ztag.ss    { background: #14532d55; color: #4ade80; }
+  .ztag.thr   { background: #43140755; color: #fb923c; }
+  .ztag.vo2   { background: #3b076455; color: #c084fc; }
+  .ztag.punch { background: #450a0a55; color: #f87171; }
+
+  .stats {
+    margin-top: 7px;
+    padding-top: 6px;
+    border-top: 1px solid #1e1e2e;
+    font-size: 0.68rem;
+    color: #64748b;
+    line-height: 1.55;
+  }
+  .stats b { color: #94a3b8; font-weight: 600; }
+
+  /* ── EMPTY MONTH ── */
+  .empty-month {
+    text-align: center;
+    padding: 60px 24px;
+    color: #334155;
+  }
+  .empty-month .em-icon { font-size: 2rem; margin-bottom: 10px; }
+  .empty-month p { font-size: 0.88rem; }
+
+  /* ─────────────────────────────────────── */
+  /* ── RACES TAB ── */
+  /* ─────────────────────────────────────── */
+
+  .races-intro {
+    text-align: center;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: #161620;
+    border: 1px solid #1e1e2e;
+    border-radius: 14px;
+  }
+  .races-intro h2 { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+  .races-intro p { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
+  .races-intro a { color: #60a5fa; text-decoration: none; }
+  .races-intro a:hover { text-decoration: underline; }
+
+  .race-filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .filter-btn {
+    background: #161620;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    transition: all 0.12s;
+  }
+  .filter-btn:hover { border-color: #2d2d45; color: #94a3b8; }
+  .filter-btn.active { background: #1e293b; border-color: #3b82f6; color: #60a5fa; }
+
+  .race-month-group { margin-bottom: 32px; }
+  .race-month-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: #475569;
+    margin-bottom: 12px;
+    padding-left: 2px;
+    border-bottom: 1px solid #1e1e2e;
+    padding-bottom: 6px;
+  }
+
+  .race-card {
+    background: #161620;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: transform 0.12s, border-color 0.12s;
+  }
+  .race-card:hover { transform: translateY(-1px); border-color: #2d2d45; }
+  .race-card.highlight { border-color: #f59e0b; background: #1a1400; }
+  .race-card.past { opacity: 0.45; }
+  .race-card.past .race-card-title { text-decoration: line-through; text-decoration-color: #64748b; }
+
+  .race-date-box {
+    background: #0f0f18;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    text-align: center;
+    padding: 6px 10px;
+    min-width: 48px;
+    flex-shrink: 0;
+  }
+  .race-date-box .rdb-month { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
+  .race-date-box .rdb-day { font-size: 1.3rem; font-weight: 900; color: #f1f5f9; line-height: 1; }
+  .race-date-box .rdb-dow { font-size: 0.58rem; color: #475569; font-weight: 600; text-transform: uppercase; }
+
+  .race-card.highlight .race-date-box { border-color: #f59e0b40; background: #2d1500; }
+  .race-card.highlight .race-date-box .rdb-day { color: #fbbf24; }
+
+  .race-card-body { flex: 1; min-width: 0; }
+  .race-card-title { font-size: 0.97rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; line-height: 1.2; }
+  .race-card.highlight .race-card-title { color: #fbbf24; }
+
+  .race-card-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 5px; }
+  .race-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .rt-crit    { background: #450a0a; color: #f87171; }
+  .rt-road    { background: #1e3a5f; color: #60a5fa; }
+  .rt-park    { background: #052e16; color: #4ade80; }
+  .rt-open    { background: #2e1065; color: #a78bfa; }
+  .rt-members { background: #1c1c00; color: #facc15; }
+  .rt-cat45   { background: #431407; color: #fb923c; }
+  .rt-past    { background: #1e1e2e; color: #64748b; }
+  .rt-yourace { background: #2d1500; color: #fbbf24; }
+
+  .race-card-detail { font-size: 0.77rem; color: #94a3b8; line-height: 1.45; }
+  .race-card-detail a { color: #60a5fa; text-decoration: none; }
+  .race-card-detail a:hover { text-decoration: underline; }
+  .race-card-detail strong { color: #cbd5e1; }
+
+  .race-card-actions { display: flex; align-items: center; flex-shrink: 0; }
+  .reg-btn {
+    background: #1e3a5f;
+    border: 1px solid #2563eb40;
+    border-radius: 8px;
+    color: #60a5fa;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    transition: all 0.12s;
+  }
+  .reg-btn:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .reg-btn.closed { background: #1e1e2e; color: #475569; border-color: #1e1e2e; cursor: default; }
+
+  .sources-note {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: #0f0f18;
+    border: 1px solid #1e1e2e;
+    border-radius: 10px;
+    font-size: 0.77rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+  .sources-note a { color: #60a5fa; text-decoration: none; }
+  .sources-note a:hover { text-decoration: underline; }
+  .sources-note strong { color: #94a3b8; }
+
+  /* ── HIDDEN ── */
+  [data-filter-hide] { display: none; }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <h1>🚴 Cam Horne</h1>
+  <div class="sub">FTP 247W &nbsp;·&nbsp; Cat 5 &nbsp;·&nbsp; NYC</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('training')">Training</button>
+  <button class="tab-btn" onclick="switchTab('races')">Races</button>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- TRAINING TAB -->
+<!-- ══════════════════════════════════ -->
+<div id="tab-training" class="tab-panel active">
+
+  <!-- COUNTDOWN / RACE RESULT BANNER -->
+  <div id="race-banner" class="banner">
+    <div class="banner-num" id="days-left">—</div>
+    <div class="banner-label" id="banner-label">days to Grant's Tomb</div>
+  </div>
+
+  <!-- ZONE REFERENCE -->
+  <div class="zones">
+    <span class="zpill z2">Z2 &nbsp;138–185W</span>
+    <span class="zpill ss">Sweet Spot &nbsp;210–222W</span>
+    <span class="zpill thr">Threshold &nbsp;230–242W</span>
+    <span class="zpill vo2">VO2 Max &nbsp;272–284W</span>
+    <span class="zpill punch">Punch &nbsp;346–420W</span>
+  </div>
+
+  <!-- MONTH NAVIGATION -->
+  <div class="month-nav">
+    <button id="btn-prev" onclick="changeMonth(-1)">‹</button>
+    <div class="month-title" id="month-title">June 2026</div>
+    <button id="btn-next" onclick="changeMonth(1)">›</button>
+  </div>
+
+  <!-- MONTH CONTENT -->
+  <div id="month-content"></div>
+
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- RACES TAB -->
+<!-- ══════════════════════════════════ -->
+<div id="tab-races" class="tab-panel">
+
+  <div class="races-intro">
+    <h2>🗽 NYC Area Races — 2026</h2>
+    <p>CRCA club series, open crits, and regional road races.<br>
+    Sources: <a href="https://www.crca.net/crca-club-series" target="_blank">CRCA Club Series</a> &nbsp;·&nbsp;
+    <a href="https://www.crca.net/open-racing-1" target="_blank">CRCA Open Racing</a> &nbsp;·&nbsp;
+    <a href="https://www.bikereg.com/events/Road-Races/NE" target="_blank">BikeReg Northeast</a></p>
+  </div>
+
+  <div class="race-filters">
+    <button class="filter-btn active" onclick="filterRaces('all', this)">All</button>
+    <button class="filter-btn" onclick="filterRaces('open', this)">Open to All</button>
+    <button class="filter-btn" onclick="filterRaces('crca', this)">CRCA Members</button>
+    <button class="filter-btn" onclick="filterRaces('upcoming', this)">Upcoming Only</button>
+  </div>
+
+  <!-- JUNE -->
+  <div class="race-month-group">
+    <div class="race-month-header">June 2026</div>
+
+    <div class="race-card past" data-type="open" data-date="2026-06-20">
+      <div class="race-date-box"><div class="rdb-month">Jun</div><div class="rdb-day">20</div><div class="rdb-dow">Sat</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">Lucarelli &amp; Castaldi Summer Classic</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-open">Open</span>
+          <span class="race-tag rt-past">Past</span>
+        </div>
+        <div class="race-card-detail">Central Park, NYC. CRCA open race. All categories.</div>
+      </div>
+      <div class="race-card-actions"><span class="reg-btn closed">Closed</span></div>
+    </div>
+
+    <div class="race-card past" data-type="open" data-date="2026-06-21">
+      <div class="race-date-box"><div class="rdb-month">Jun</div><div class="rdb-day">21</div><div class="rdb-dow">Sun</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">Harlem Skyscraper Classic</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-open">Open</span>
+          <span class="race-tag rt-past">Past</span>
+        </div>
+        <div class="race-card-detail">Harlem, NYC. Cat 4/5 field available. One to target next year.</div>
+      </div>
+      <div class="race-card-actions"><span class="reg-btn closed">Past</span></div>
+    </div>
+
+    <div class="race-card highlight" data-type="open" data-date="2026-06-27">
+      <div class="race-date-box"><div class="rdb-month">Jun</div><div class="rdb-day">27</div><div class="rdb-dow">Sat</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">🏁 Grant's Tomb Criterium</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-open">Open</span>
+          <span class="race-tag rt-cat45">Cat 4/5</span>
+          <span class="race-tag rt-yourace">Your Race</span>
+        </div>
+        <div class="race-card-detail"><strong>7:45am</strong> — Riverside Drive, NYC. CRCA's flagship street crit. One of the largest in the tri-state area. <strong>You're registered.</strong></div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.bikereg.com/grants-tomb-criterium-2026" target="_blank">BikeReg</a></div>
+    </div>
+  </div>
+
+  <!-- JULY -->
+  <div class="race-month-group">
+    <div class="race-month-header">July 2026</div>
+
+    <div class="race-card highlight" data-type="open" data-date="2026-07-26">
+      <div class="race-date-box"><div class="rdb-month">Jul</div><div class="rdb-day">26</div><div class="rdb-dow">Sun</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">NYC Cup — Riverside Criterium</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-open">Open</span>
+          <span class="race-tag rt-yourace">Your Race</span>
+        </div>
+        <div class="race-card-detail">Riverside Drive, NYC. ⚠️ <strong>5 days after flying home from the UK</strong> (Jul 21) — legs will depend on how active you were over there. Register closer to the date once you know how you're feeling.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.bikereg.com/rs" target="_blank">BikeReg</a></div>
+    </div>
+
+    <div class="race-card" data-type="crca" data-date="2026-07-12">
+      <div class="race-date-box"><div class="rdb-month">Jul</div><div class="rdb-day">12</div><div class="rdb-dow">Sun</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">CRCA Club Series — Race 8</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-members">CRCA Members</span>
+          <span class="race-tag rt-cat45">Dev Series</span>
+        </div>
+        <div class="race-card-detail"><strong>5:30am</strong> — Central Park, NYC. W91 Scratch Format. Dev field: MDev (C laps). <strong>Note:</strong> requires CRCA membership to enter.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.crca.net/crca-club-series" target="_blank">Info</a></div>
+    </div>
+
+    <div class="race-card" data-type="crca" data-date="2026-07-25">
+      <div class="race-date-box"><div class="rdb-month">Jul</div><div class="rdb-day">25</div><div class="rdb-dow">Sat</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">CRCA Club Series — Race 9</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-members">CRCA Members</span>
+          <span class="race-tag rt-cat45">Dev Series</span>
+        </div>
+        <div class="race-card-detail"><strong>5:30am</strong> — Central Park, NYC. Engineer's Gate Points Format. Dev field included.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.crca.net/crca-club-series" target="_blank">Info</a></div>
+    </div>
+  </div>
+
+  <!-- AUGUST -->
+  <div class="race-month-group">
+    <div class="race-month-header">August 2026</div>
+
+    <div class="race-card highlight" data-type="open" data-date="2026-08-08">
+      <div class="race-date-box"><div class="rdb-month">Aug</div><div class="rdb-day">8</div><div class="rdb-dow">Sat</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">19th Annual Tour of the Catskills</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-road">Road</span>
+          <span class="race-tag rt-open">Open</span>
+          <span class="race-tag rt-yourace">Your Race</span>
+        </div>
+        <div class="race-card-detail">Tannersville, NY. Three distances — <strong>74mi</strong> (9:00am, $102) · <strong>52mi</strong> (10:00am, $70) · <strong>27mi</strong> (11:00am, $60). Registration closes Fri Aug 7 5pm ET. Field cap 500 total.<br><strong>Note:</strong> Arrives with 18 days back from the UK — legs should be well recovered.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.bikereg.com/catskills" target="_blank">BikeReg</a></div>
+    </div>
+
+    <div class="race-card" data-type="open" data-date="2026-08-02">
+      <div class="race-date-box"><div class="rdb-month">Aug</div><div class="rdb-day">2</div><div class="rdb-dow">Sun</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">Dave Jordan Central Park Classic</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-open">Open</span>
+          <span class="race-tag rt-park">Central Park</span>
+        </div>
+        <div class="race-card-detail"><strong>5:40am</strong> — Central Park, NYC. Most prestigious CP race. Met Finish Scratch Format. Free for CRCA members. Open to all via BikeReg.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.bikereg.com" target="_blank">BikeReg</a></div>
+    </div>
+
+    <div class="race-card" data-type="crca" data-date="2026-08-09">
+      <div class="race-date-box"><div class="rdb-month">Aug</div><div class="rdb-day">9</div><div class="rdb-dow">Sun</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">CRCA Club Championship</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-members">CRCA Members</span>
+        </div>
+        <div class="race-card-detail"><strong>5:45am</strong> — Central Park, NYC. W98 Scratch Format. Season championship race. Masters field included.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.crca.net/crca-club-series" target="_blank">Info</a></div>
+    </div>
+
+    <div class="race-card" data-type="crca" data-date="2026-08-16">
+      <div class="race-date-box"><div class="rdb-month">Aug</div><div class="rdb-day">16</div><div class="rdb-dow">Sun</div></div>
+      <div class="race-card-body">
+        <div class="race-card-title">CRCA Club Series — Race 12 (Final)</div>
+        <div class="race-card-meta">
+          <span class="race-tag rt-crit">Crit</span>
+          <span class="race-tag rt-members">CRCA Members</span>
+          <span class="race-tag rt-cat45">Dev Series</span>
+        </div>
+        <div class="race-card-detail"><strong>5:45am</strong> — Central Park, NYC. Power Points format. Season finale. Dev field included.</div>
+      </div>
+      <div class="race-card-actions"><a class="reg-btn" href="https://www.crca.net/crca-club-series" target="_blank">Info</a></div>
+    </div>
+  </div>
+
+  <div class="sources-note">
+    <strong>CRCA Membership note:</strong> The Club Series (July–August races) requires CRCA membership. Basic membership is ~$100/yr and gives you access to 12 races in Central Park. Worth it if you're planning to race regularly.
+    Season Pass = unlimited club races + discounted open events.<br><br>
+    <strong>Check for more races:</strong>
+    <a href="https://www.bikereg.com/events/Road-Races/NE" target="_blank">BikeReg Northeast Road Races</a> &nbsp;·&nbsp;
+    <a href="https://www.crca.net/open-racing-1" target="_blank">CRCA Open Racing</a> &nbsp;·&nbsp;
+    <a href="https://www.crca.net/home-1/#calendar" target="_blank">CRCA Full Calendar</a>
+    <br><br>
+    <strong>Last updated:</strong> June 22, 2026. Race listings refreshed manually.
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+// TRAINING DATA
+// ─────────────────────────────────────────────────────────
+
+const MONTHS = [
+  { key: '2026-06', label: 'June 2026' },
+  { key: '2026-07', label: 'July 2026' },
+  { key: '2026-08', label: 'August 2026' },
+];
+
+const TRAINING = {
+  '2026-06': [
+    {
+      label: 'Week 1', sublabel: 'June 10–15 · Quality + Long Ride',
+      days: [
+        {
+          date: '2026-06-10', dow: 'Wed Jun 10', name: 'FTP Test', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: '<strong>247W confirmed</strong> — 20-min protocol, 260W avg × 0.95',
+          stats: '47.3km · 96min · 169W avg<br>HR <b>151</b> avg · 191 max<br>Recovery <b>63%</b> · HRV <b>51ms</b> · RHR 58',
+        },
+        {
+          date: '2026-06-11', dow: 'Thu Jun 11', name: 'Light Gym', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: 'Upper body only. No legs.',
+          stats: 'Recovery <b>42%</b> · HRV <b>41ms</b> · RHR 61',
+        },
+        {
+          date: '2026-06-12', dow: 'Fri Jun 12', name: 'Crit Sim', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: '<strong>~82 min</strong> — 15min warmup → 5×(6min threshold + 30sec punch + 4min recovery) → 15min cooldown',
+          tags: [{cls:'thr',text:'Threshold 230–242W'},{cls:'punch',text:'Punch 346–420W'}],
+          stats: '53.9km · 116min · 170W avg<br>HR <b>148</b> avg · 185 max · Strain <b>15.4</b><br>Recovery <b>94%</b> · HRV <b>67ms</b>',
+        },
+        {
+          date: '2026-06-13', dow: 'Sat Jun 13', name: 'Long Ride', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: '<strong>~3h25m</strong> — 20min warmup → 40min Z2 → 3×15min sweet spot (5min Z2) → 70min Z2 → 20min cooldown',
+          tags: [{cls:'z2',text:'Z2 138–185W'},{cls:'ss',text:'Sweet Spot 210–222W'}],
+          stats: '78.6km · 2h52min · 166W avg<br>HR <b>144</b> avg · 173 max · Strain <b>15.6</b><br>Recovery <b>64%</b> · HRV <b>51ms</b>',
+        },
+        {
+          date: '2026-06-14', dow: 'Sun Jun 14', name: 'Rest', cls: '',
+          nameStyle: 'color:#334155',
+        },
+        {
+          date: '2026-06-15', dow: 'Mon Jun 15', name: 'Easy Spin', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: 'Optional 45min Z2. Flush the legs.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+          stats: '37.6km · 83min · 156W avg<br>HR <b>127</b> avg · 157 max · Strain <b>9.0</b><br>Recovery <b>94%</b> · HRV <b>92ms</b>',
+        },
+      ]
+    },
+    {
+      label: 'Week 2', sublabel: 'June 16–21 · Last Hard Week → Adjusted for Solstice',
+      days: [
+        {
+          date: '2026-06-16', dow: 'Tue Jun 16', name: 'VO2 Intervals', cls: 'modified',
+          badge: 'b-modified', badgeText: 'Modified',
+          detail: '<strong>Planned:</strong> 5×4min @ 272–284W — <strong>Actual:</strong> rode at tempo, didn\'t hit VO2 zones',
+          tags: [{cls:'vo2',text:'VO2 272–284W'}],
+          stats: '47.4km · 98min · 174W avg · NP <b>201W</b><br>HR <b>145</b> avg · Recovery <b>88%</b> · HRV <b>74ms</b>',
+        },
+        {
+          date: '2026-06-17', dow: 'Wed Jun 17', name: 'Gym / Rest', cls: '',
+          badge: 'b-gym', badgeText: 'Gym',
+          detail: 'Read the legs. Full rest if fried.',
+        },
+        {
+          date: '2026-06-18', dow: 'Thu Jun 18', name: 'Rest', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: 'Knicks parade + date night. Off the bike entirely — right call.',
+        },
+        {
+          date: '2026-06-19', dow: 'Fri Jun 19', name: 'Solstice Ride 70mi', cls: 'missed',
+          badge: 'b-missed', badgeText: 'Missed',
+          detail: 'Recovery 26% — red zone. Right call to skip. Sleep the night before was only 5.7hrs.',
+          stats: 'Recovery <b style="color:#f87171">26%</b> · HRV <b>45ms</b> · RHR 65',
+        },
+        {
+          date: '2026-06-20', dow: 'Sat Jun 20', name: 'Unexpected Ride', cls: 'modified',
+          badge: 'b-modified', badgeText: 'Unplanned',
+          detail: 'Was supposed to be a rest buffer — ended up doing a big 3hr Z2 day.',
+          stats: '78.8km · 3hr · 147W avg · NP <b>169W</b><br>HR <b>130</b> avg · Recovery <b>36%</b> · HRV <b>40ms</b>',
+        },
+        {
+          date: '2026-06-21', dow: 'Sun Jun 21', name: 'Race Simulation', cls: 'missed',
+          badge: 'b-missed', badgeText: 'Missed',
+          detail: 'Recovery 60% (yellow) — easy beach ride instead. Fitness is banked.',
+          tags: [{cls:'thr',text:'Threshold 230–242W'},{cls:'punch',text:'Punch 346–420W'}],
+          stats: 'Actual: beach ride <b>86W avg</b> · NP 108W · 29.9km<br>Recovery <b>60%</b> · HRV <b>56ms</b>',
+        },
+      ]
+    },
+    {
+      label: 'Taper', sublabel: 'June 22–27 · Stay Sharp, Don\'t Dig',
+      days: [
+        { date: '2026-06-22', dow: 'Mon Jun 22', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-06-23', dow: 'Tue Jun 23', name: 'Activation', cls: 'done',
+          badge: 'b-done', badgeText: 'Done',
+          detail: '<strong>71 min</strong> — Mostly Z2, 4×30sec sprints buried in it',
+          stats: '71min indoor · HR <b>140</b> avg · 181 max<br>Strain <b>11.3</b> · Recovery <b>65%</b> · HRV <b>56ms</b>',
+          tags: [{cls:'z2',text:'Z2'},{cls:'punch',text:'4×30sec sprint'}],
+        },
+        { date: '2026-06-24', dow: 'Wed Jun 24', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-06-25', dow: 'Thu Jun 25', name: 'Short Activation', cls: '',
+          badge: 'b-taper', badgeText: 'Taper',
+          detail: '<strong>40 min</strong> — 10min warmup → 6×20sec sprints → 15min easy',
+          tags: [{cls:'punch',text:'6×20sec sprint'}],
+        },
+        { date: '2026-06-26', dow: 'Fri Jun 26', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        { date: '2026-06-27', dow: 'Sat Jun 27', name: '🏁 Race Day', cls: '', nameStyle: 'color:#f59e0b',
+          detail: 'Grant\'s Tomb Criterium — 7:45am, Riverside Drive.' },
+      ]
+    }
+  ],
+
+  '2026-07': [
+    {
+      label: 'Recovery Week', sublabel: 'June 28 – July 2 · Post-Race Flush',
+      days: [
+        { date: '2026-06-28', dow: 'Sun Jun 28', name: 'Rest', cls: '', nameStyle: 'color:#334155', detail: 'Race recovery. Full rest.' },
+        { date: '2026-06-29', dow: 'Mon Jun 29', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-06-30', dow: 'Tue Jun 30', name: 'Easy Spin', cls: '',
+          badge: 'b-easy', badgeText: 'Easy',
+          detail: '45–60min easy flush. HR under 140, no pressure.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        { date: '2026-07-01', dow: 'Wed Jul 1', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-07-02', dow: 'Thu Jul 2', name: 'Easy Spin', cls: '',
+          badge: 'b-easy', badgeText: 'Easy',
+          detail: '60min easy. Last ride before flying.',
+          tags: [{cls:'z2',text:'Z2'}],
+        },
+      ]
+    },
+    {
+      label: '✈️ UK Trip', sublabel: 'July 3–21 · Richmond Park, gym with bro, group rides',
+      days: [
+        { date: '2026-07-03', dow: 'Thu Jul 3', name: 'Fly to UK ✈️', cls: '', nameStyle: 'color:#60a5fa', detail: 'Travel day.' },
+        { date: '2026-07-04', dow: 'Fri Jul 4', name: 'Settle In', cls: '', nameStyle: 'color:#475569', detail: '4th of July from abroad.' },
+        { date: '2026-07-05', dow: 'Sat Jul 5', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-06', dow: 'Sun Jul 6', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-07', dow: 'Mon Jul 7', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-08', dow: 'Tue Jul 8', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-09', dow: 'Wed Jul 9', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-10', dow: 'Thu Jul 10', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-11', dow: 'Fri Jul 11', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-12', dow: 'Sat Jul 12', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-13', dow: 'Sun Jul 13', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-14', dow: 'Mon Jul 14', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-15', dow: 'Tue Jul 15', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-16', dow: 'Wed Jul 16', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-17', dow: 'Thu Jul 17', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-18', dow: 'Fri Jul 18', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-19', dow: 'Sat Jul 19', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-20', dow: 'Sun Jul 20', name: 'UK', cls: '', nameStyle: 'color:#475569' },
+        { date: '2026-07-21', dow: 'Mon Jul 21', name: 'Fly home ✈️', cls: '', nameStyle: 'color:#60a5fa', detail: 'Back to NYC.' },
+      ]
+    },
+    {
+      label: 'Back to Base', sublabel: 'July 22–31 · Shake off the jet lag',
+      days: [
+        { date: '2026-07-22', dow: 'Tue Jul 22', name: 'Rest', cls: '', nameStyle: 'color:#334155', detail: 'Jet lag day. Sleep.' },
+        {
+          date: '2026-07-23', dow: 'Wed Jul 23', name: 'Easy Spin', cls: '',
+          badge: 'b-easy', badgeText: 'Easy',
+          detail: '60min easy. Just get the legs moving.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        { date: '2026-07-24', dow: 'Thu Jul 24', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-07-25', dow: 'Sat Jul 25', name: 'Z2 Ride', cls: '',
+          badge: 'b-base', badgeText: 'Base',
+          detail: '90min easy Z2. Gauge how the body feels post-trip.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        { date: '2026-07-26', dow: 'Sun Jul 26', name: '🏁 NYC Cup Crit?', cls: '',
+          nameStyle: 'color:#f59e0b',
+          detail: 'Riverside Drive. Register closer to the date — see how legs feel after the UK.',
+        },
+        {
+          date: '2026-07-27', dow: 'Mon Jul 27', name: 'Gym', cls: '',
+          badge: 'b-gym', badgeText: 'Gym',
+          detail: 'Full body strength. Ease back in.',
+        },
+        {
+          date: '2026-07-29', dow: 'Wed Jul 29', name: 'Z2 Ride', cls: '',
+          badge: 'b-base', badgeText: 'Base',
+          detail: '90min Z2.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        {
+          date: '2026-07-31', dow: 'Fri Jul 31', name: 'Sweet Spot', cls: '',
+          badge: 'b-quality', badgeText: 'Quality',
+          detail: '90min — 2×12min sweet spot (210–222W). First quality session back.',
+          tags: [{cls:'ss',text:'Sweet Spot 210–222W'}],
+        },
+      ]
+    },
+  ],
+
+  '2026-08': [
+    {
+      label: 'Build Week 1', sublabel: 'August 1–10 · Back to Full Training',
+      days: [
+        { date: '2026-08-01', dow: 'Sat Aug 1', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        { date: '2026-08-02', dow: 'Sun Aug 2', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-08-03', dow: 'Mon Aug 3', name: 'Gym', cls: '',
+          badge: 'b-gym', badgeText: 'Gym',
+          detail: 'Full body strength. Squats, deadlifts, rows, core. 60min.',
+        },
+        {
+          date: '2026-08-05', dow: 'Wed Aug 5', name: 'Z2 Ride', cls: '',
+          badge: 'b-base', badgeText: 'Base',
+          detail: '90min Z2.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        {
+          date: '2026-08-06', dow: 'Thu Aug 6', name: 'Sweet Spot', cls: '',
+          badge: 'b-quality', badgeText: 'Quality',
+          detail: '2hr — 2×15min sweet spot (210–222W), Z2 remainder.',
+          tags: [{cls:'ss',text:'Sweet Spot 210–222W'},{cls:'z2',text:'Z2'}],
+        },
+        {
+          date: '2026-08-08', dow: 'Sat Aug 8', name: '🏁 Tour of the Catskills', cls: '',
+          nameStyle: 'color:#f59e0b',
+          detail: 'Tannersville, NY. 74mi / 52mi / 27mi — TBD. 9–11am start depending on distance.',
+        },
+        {
+          date: '2026-08-09', dow: 'Sun Aug 9', name: 'Easy Recovery', cls: '',
+          badge: 'b-easy', badgeText: 'Easy',
+          detail: '60–75min easy spin.',
+          tags: [{cls:'z2',text:'Z2'}],
+        },
+      ]
+    },
+    {
+      label: 'Build Week 2', sublabel: 'August 11–17 · Sharpening',
+      days: [
+        { date: '2026-08-10', dow: 'Mon Aug 10', name: 'Rest', cls: '', nameStyle: 'color:#334155' },
+        {
+          date: '2026-08-11', dow: 'Tue Aug 11', name: 'Gym', cls: '',
+          badge: 'b-gym', badgeText: 'Gym',
+          detail: 'Full body. 60min.',
+        },
+        {
+          date: '2026-08-12', dow: 'Wed Aug 12', name: 'Z2 Ride', cls: '',
+          badge: 'b-base', badgeText: 'Base',
+          detail: '90min Z2.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        {
+          date: '2026-08-13', dow: 'Thu Aug 13', name: 'Crit Sim', cls: '',
+          badge: 'b-quality', badgeText: 'Quality',
+          detail: '85min — 5×(6min threshold + 30sec punch + 4min recovery).',
+          tags: [{cls:'thr',text:'Threshold 230–242W'},{cls:'punch',text:'Punch 346–420W'}],
+        },
+        {
+          date: '2026-08-15', dow: 'Sat Aug 15', name: 'Long Z2', cls: '',
+          badge: 'b-long', badgeText: 'Long',
+          detail: '3hr Z2.',
+          tags: [{cls:'z2',text:'Z2 138–185W'}],
+        },
+        {
+          date: '2026-08-17', dow: 'Mon Aug 17', name: 'Rest', cls: '', nameStyle: 'color:#334155',
+        },
+      ]
+    },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────
+// RENDERING
+// ─────────────────────────────────────────────────────────
+
+let currentMonthIdx = 0;
+const todayStr = new Date().toISOString().split('T')[0];
+
+function renderTraining() {
+  const month = MONTHS[currentMonthIdx];
+  document.getElementById('month-title').textContent = month.label;
+  document.getElementById('btn-prev').disabled = currentMonthIdx === 0;
+  document.getElementById('btn-next').disabled = currentMonthIdx === MONTHS.length - 1;
+
+  const weeks = TRAINING[month.key];
+  const container = document.getElementById('month-content');
+
+  if (!weeks || weeks.length === 0) {
+    container.innerHTML = `
+      <div class="empty-month">
+        <div class="em-icon">🗓️</div>
+        <p>No training data yet for ${month.label}.</p>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  for (const week of weeks) {
+    html += `<div class="week-block">
+      <div class="week-label">${week.label} &nbsp;<em>${week.sublabel}</em></div>
+      <div class="grid">`;
+    for (const d of week.days) {
+      html += renderCard(d);
+    }
+    html += `</div></div>`;
+  }
+  container.innerHTML = html;
+}
+
+function renderCard(d) {
+  const isToday = d.date === todayStr;
+  const cls = [d.cls || '', isToday ? 'today' : ''].filter(Boolean).join(' ');
+
+  let inner = `<div class="card-dow">${d.dow}</div>`;
+  inner += `<div class="card-name"${d.nameStyle ? ` style="${d.nameStyle}"` : ''}>${d.name}</div>`;
+
+  if (d.badge) {
+    inner += `<span class="badge ${d.badge}">${d.badgeText}</span>`;
+  }
+  if (d.detail) {
+    inner += `<div class="detail">${d.detail}</div>`;
+  }
+  if (d.tags && d.tags.length) {
+    inner += `<div class="ztags">` + d.tags.map(t => `<span class="ztag ${t.cls}">${t.text}</span>`).join('') + `</div>`;
+  }
+  if (d.stats) {
+    inner += `<div class="stats">${d.stats}</div>`;
+  }
+
+  return `<div class="card ${cls}" data-date="${d.date}">${inner}</div>`;
+}
+
+function changeMonth(dir) {
+  currentMonthIdx = Math.max(0, Math.min(MONTHS.length - 1, currentMonthIdx + dir));
+  renderTraining();
+}
+
+// Start on the current month
+(function() {
+  const now = new Date();
+  const nowKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  const idx = MONTHS.findIndex(m => m.key === nowKey);
+  if (idx !== -1) currentMonthIdx = idx;
+  renderTraining();
+})();
+
+// ─────────────────────────────────────────────────────────
+// COUNTDOWN
+// ─────────────────────────────────────────────────────────
+(function() {
+  const raceDate = new Date('2026-06-27T07:45:00-04:00');
+  const now = new Date();
+  const banner = document.getElementById('race-banner');
+  const numEl = document.getElementById('days-left');
+  const labelEl = document.getElementById('banner-label');
+  if (now >= raceDate) {
+    banner.classList.add('race-done');
+    numEl.textContent = '🏁';
+    labelEl.textContent = 'Grant\'s Tomb — race day!';
+  } else {
+    const diff = Math.ceil((raceDate - now) / (1000 * 60 * 60 * 24));
+    numEl.textContent = diff;
+    labelEl.textContent = 'days to Grant\'s Tomb Criterium';
+  }
+})();
+
+// ─────────────────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────
+// RACE FILTERS
+// ─────────────────────────────────────────────────────────
+function filterRaces(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.race-card').forEach(card => {
+    const cardType = card.dataset.type;
+    const cardDate = card.dataset.date;
+    const past = card.classList.contains('past') || (cardDate && cardDate < todayStr);
+
+    let show = true;
+    if (type === 'open' && cardType !== 'open') show = false;
+    if (type === 'crca' && cardType !== 'crca') show = false;
+    if (type === 'upcoming' && past) show = false;
+
+    card.style.display = show ? '' : 'none';
+  });
+}
+</script>
+
+</body>
+</html>
